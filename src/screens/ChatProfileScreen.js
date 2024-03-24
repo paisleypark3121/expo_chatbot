@@ -1,10 +1,20 @@
 import React from 'react'
-import { Text } from 'react-native';
+import { View, Text, Button, StyleSheet, Platform } from 'react-native';
 
 export default function ChatProfileScreen() {
   return (
-    <div>
-      <Text>Hello Profle</Text>
-    </div>
+    <View style={styles.container}>
+      <Text>
+        Hello Profile
+      </Text>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

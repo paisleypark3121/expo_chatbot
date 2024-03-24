@@ -13,12 +13,15 @@ rfc React Functional Component
 
 ---
 
-NAVIGATOR
+DRAWER NAVIGATOR
 
 npm install @react-navigation/native
-npm install @react-navigation/drawer
 npx expo install react-native-screens react-native-safe-area-context
-npm install react-native-screens react-native-safe-area-context
+npm install @react-navigation/drawer
+npx expo install react-native-gesture-handler react-native-reanimated
+
+To finalize installation of react-native-gesture-handler, add the following at the top (make sure it's at the top and there's nothing else before it) of your entry file, such as index.js or App.js:
+import 'react-native-gesture-handler';
 
 ---
 

@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
@@ -7,6 +8,8 @@ import LoginScreen from './src/screens/LoginScreen';
 import ChatbotScreen from './src/screens/ChatbotScreen';
 import ChatSettingsScreen from './src/screens/ChatSettingsScreen';
 import ChatProfileScreen from './src/screens/ChatProfileScreen';
+import NetworkGraphPageScreen from './src/screens/NetworkGraphPageScreen';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -30,6 +33,7 @@ const AuthenticatedApp = () => {
       <Drawer.Screen name="Chatbot" component={ChatbotScreen} />
       <Drawer.Screen name="Profile" component={ChatProfileScreen} />
       <Drawer.Screen name="Settings" component={ChatSettingsScreen} />
+      <Drawer.Screen name="Network" component={NetworkGraphPageScreen} />
     </Drawer.Navigator>
   );
 };

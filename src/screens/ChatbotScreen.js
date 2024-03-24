@@ -1,7 +1,19 @@
 import React,{useState} from 'react';
-import {View, Text, TextInput, Pressable, FlatList, ActivityIndicator, StyleSheet} from 'react-native';
+import {
+    View, 
+    Text, 
+    TextInput, 
+    Pressable, 
+    FlatList, 
+    ActivityIndicator, 
+    StyleSheet,
+    KeyboardAvoidingView,
+    Platform
+} from 'react-native';
 import OpenAI from "openai";
 import ChatBubble from '../ChatBubble';
+
+
 
 const Chatbot = ()=> {
     const [chat, setChat]= useState([]);
@@ -14,6 +26,47 @@ const Chatbot = ()=> {
         dangerouslyAllowBrowser: true
     });
 
+    const handleGenerateMindMap = async (text) => {
+        setLoading(true);
+    
+        try {
+            const response = await fetch('https://mindmap2024.replit.app/mm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': 'mm_generation_1234',
+                },
+                body: JSON.stringify({
+                    language: 'italian',
+                    message: text,
+                    type: 'small',
+                    physics: 'False',
+                }),
+            });
+    
+            const jsonResponse = await response.json();
+    
+            if (jsonResponse.success && jsonResponse.html) {
+                // Update chat state to include the new mind map
+                setChat(currentChat => [
+                    ...currentChat,
+                    {
+                        role: "model",
+                        htmlContent: jsonResponse.html,
+                        type: 'mindmap',
+                    }
+                ]);
+            } else {
+                throw new Error('Failed to generate mind map');
+            }
+        } catch (error) {
+            console.error('Error generating mind map:', error);
+            setError("An error occurred while generating the mind map. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    
     const handleUserInput = async () => {
         let updatedChat = [
             ...chat,
@@ -43,7 +96,7 @@ const Chatbot = ()=> {
                 presence_penalty: 0,
             });
 
-            console.log(response.choices[0]);
+            //console.log(response.choices[0]);
 
             const updatedChatWithModel = [
                 ...updatedChat,
@@ -68,17 +121,39 @@ const Chatbot = ()=> {
     const renderChatItem=({item}) => (
         <ChatBubble
             role={item.role}
-            text={item.parts[0].text}
+            text={item.parts ? item.parts[0].text : null}
+            onGenerateMindMap={() => handleGenerateMindMap(item.parts[0].text)}
+            setLoading={setLoading} // Pass setLoading down as a prop
+            // any other props you need to pass down
         />
     );
 
     return (
+        <KeyboardAvoidingView
+            style={{flex: 1}} // Make sure it fills the screen
+            behavior={Platform.OS === "ios" ? "padding" : "height"} // Adjust the behavior based on the platform
+            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0} // Adjust the vertical offset
+        >
         <View style={styles.container}>
             <Text style={styles.title}>OpenAI ChatBot</Text>
-            <FlatList
+            {/* <FlatList
                 data={chat}
                 renderItem={renderChatItem}
                 keyExtractor={(item, index)=>index.toString()}
+                contentContainerStyle={styles.chatContainer}
+            /> */}
+            <FlatList
+                data={chat}
+                renderItem={({ item }) => (
+                    <ChatBubble
+                        role={item.role}
+                        text={item.parts ? item.parts[0].text : null}
+                        htmlContent={item.htmlContent}
+                        type={item.type}
+                        onGenerateMindMap={() => handleGenerateMindMap(item.parts[0].text)}
+                    />
+                )}
+                keyExtractor={(item, index) => index.toString()}
                 contentContainerStyle={styles.chatContainer}
             />
             <View style={styles.inputContainer}>
@@ -96,6 +171,7 @@ const Chatbot = ()=> {
             {loading && <ActivityIndicator style={styles.loading} color="#333" />}
             {error && <Text style={styles.error}>{error}</Text>}
         </View>
+        </KeyboardAvoidingView>
     );
 };
 
