@@ -33,7 +33,7 @@ const AuthenticatedApp = () => {
       <Drawer.Screen name="Chatbot" component={ChatbotScreen} />
       <Drawer.Screen name="Profile" component={ChatProfileScreen} />
       <Drawer.Screen name="Settings" component={ChatSettingsScreen} />
-      <Drawer.Screen name="Network" component={NetworkGraphPageScreen} />
+      {/* <Drawer.Screen name="Network" component={NetworkGraphPageScreen} /> */}
     </Drawer.Navigator>
   );
 };

@@ -3,7 +3,11 @@ cd ChatBot
 npx expo install react-dom react-native-web @expo/metro-runtime
 npx expo start
 
-npm i react-native-vector-icons
+---
+
+ICONS
+
+npm i react-native-vector-icons --save
 
 ---
 
@@ -31,26 +35,9 @@ npm install @react-native-async-storage/async-storage
 
 ---
 
-ESEMPIO USESTATE
-
-import React, { useState } from 'react';
-import { View, Text, Button } from 'react-native';
-
-const Counter = () => {
-// Inizializza lo stato 'contatore' con un valore iniziale di 0
-const [contatore, setContatore] = useState(0);
-
-// Funzione per incrementare il contatore
-const incrementa = () => {
-setContatore(contatore + 1);
-};
-
-return (
-<View>
-<Text>Conteggio: {contatore}</Text>
-<Button title="Incrementa" onPress={incrementa} />
-</View>
-);
-};
-
-export default Counter;
+EXPO PUBLISH
+Create a new build: eas build
+List all branches: eas branch:list
+Create a new branch: eas branch:create <branch-name>
+Delete a branch: eas branch:delete <branch-name>
+Update a branch: eas update --branch <branch-name> (or simply eas update and later you will be asked to choose the branch)

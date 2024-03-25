@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Pressable, Text, StyleSheet } from 'react-native';
+import { View, TextInput, Pressable, Text, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import credentials from '../data/credentials.json';
 import { useAuth } from '../context/AuthContext';
@@ -27,33 +27,57 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      <Pressable 
-        style={styles.button} 
-        title="Login" 
-        onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </Pressable>
-      {/* {loginError && <Text>Username o password errati!</Text>} */}
-    </View>
+      <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : null}
+          style={{flex: 1}}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 170 : 0}
+        >
+      <View style={styles.container}>        
+        <View style={styles.imageContainer}>
+            <Image
+            source={require('../../assets/logo.png')}
+            style={styles.image}
+            resizeMode="contain"
+            />
+        </View>
+        <Text style={styles.title}>Login</Text>
+        <TextInput
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+        />
+        <Pressable 
+          style={styles.button} 
+          title="Login" 
+          onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </Pressable>
+        {/* {loginError && <Text>Username o password errati!</Text>} */}
+        
+      </View>
+      </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  imageContainer: {
+    height: 400,
+    width: '100%',
+    maxWidth: '100%',
+    paddingBottom: 20
+  },
+  image: {
+      height: '100%',
+      width: '100%',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

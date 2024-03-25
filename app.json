@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ChatBot",
-    "slug": "ChatBot",
+    "name": "DyslexIA",
+    "slug": "DyslexIA",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
