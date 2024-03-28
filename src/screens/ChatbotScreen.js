@@ -41,6 +41,7 @@ const Chatbot = ({ navigation, route })=> {
         {
             role: "system",
             parts: [{ text: systemRole }],
+            streaming: false
         }
     ]);    
 
@@ -77,6 +78,7 @@ const Chatbot = ({ navigation, route })=> {
         setChat([{
             role: "system",
             parts: [{ text: systemRole }],
+            streaming: false
         }]);
     }, [systemRole]);
 
@@ -84,6 +86,7 @@ const Chatbot = ({ navigation, route })=> {
         setChat([{
             role: "system",
             parts: [{ text: systemRole }],
+            streaming: false
         }]);
         setUserInput(""); 
         setLoading(false); 
@@ -137,6 +140,7 @@ const Chatbot = ({ navigation, route })=> {
                         role: "assistant",
                         htmlContent: jsonResponse.html,
                         type: 'mindmap',
+                        streaming: false
                     }
                 ]);
 
@@ -163,7 +167,8 @@ const Chatbot = ({ navigation, route })=> {
     
             appendMessage({
                 role: "user",
-                parts: [{ text: userInput }]
+                parts: [{ text: userInput }],
+                streaming: false
             });
 
             const messagesForAPI = chat
@@ -183,7 +188,8 @@ const Chatbot = ({ navigation, route })=> {
     
             appendMessage({
                 role: "assistant",
-                parts: [{ text: response.choices[0].message.content }], // Ensure this path matches the API response structure
+                parts: [{ text: response.choices[0].message.content }],
+                streaming: true
             });
     
             flatListRef.current?.scrollToEnd({ animated: true });
@@ -200,15 +206,16 @@ const Chatbot = ({ navigation, route })=> {
     };
     
 
-    const renderChatItem=({item}) => (
-            <ChatBubble
-                role={item.role}
-                text={item.parts ? item.parts[0].text : null}
-                voice={voice} 
-                onGenerateMindMap={() => handleGenerateMindMap(item.parts[0].text)}
-                setLoading={setLoading}            
-            />
-    );
+    // const renderChatItem=({item}) => (
+    //         <ChatBubble
+    //             role={item.role}
+    //             text={item.parts ? item.parts[0].text : null}
+    //             voice={voice} 
+    //             streaming={item.streaming}
+    //             onGenerateMindMap={() => handleGenerateMindMap(item.parts[0].text)}
+    //             setLoading={setLoading}            
+    //         />
+    // );
 
     return (
         <KeyboardAvoidingView
@@ -233,6 +240,7 @@ const Chatbot = ({ navigation, route })=> {
                         role={item.role}
                         text={item.parts ? item.parts[0].text : null}
                         voice={voice} 
+                        streaming={item.streaming}
                         htmlContent={item.htmlContent}
                         type={item.type}                        
                         onGenerateMindMap={() => handleGenerateMindMap(item.parts[0].text)}

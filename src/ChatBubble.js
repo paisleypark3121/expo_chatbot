@@ -5,14 +5,37 @@ import { WebView } from 'react-native-webview';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppContext } from './context/AppContext';
 
-const ChatBubble = ({ role, text, voice, onGenerateMindMap, type, htmlContent }) => {
+const ChatBubble = ({ role, text, voice, onGenerateMindMap, type, htmlContent, streaming }) => {
     const [showWebView, setShowWebView] = useState(false);
     const { font, setFont } = useAppContext();
+    const [visibleText, setVisibleText] = useState('');
 
     const chatTextStyle = {
         ...styles.chatText,
         fontFamily: font === 'OpenDyslexic-Regular' ? 'OpenDyslexic-Regular' : 'System',
     };
+
+    useEffect(() => {
+        console.log("EFFECT")
+        console.log(streaming)
+        if (streaming) {
+            let index = 0;
+            setVisibleText('');
+    
+            const intervalId = setInterval(() => {
+                if (index < text.length) {
+                    setVisibleText((prevText) => prevText + text.charAt(index));
+                    index++;
+                } else {
+                    clearInterval(intervalId);
+                }
+            }, 30); // Regola la velocità di visualizzazione qui
+    
+            return () => clearInterval(intervalId); // Cleanup per evitare effetti indesiderati
+        } else {
+            setVisibleText(text);
+        }
+    }, [text, streaming]); 
 
     const speak = async () => {
         // try {
@@ -72,7 +95,8 @@ const ChatBubble = ({ role, text, voice, onGenerateMindMap, type, htmlContent })
             role === "user" ? styles.userChatItem : styles.assistantChatItem
         ]}>
             {/* <Text style={styles.chatText}>{text}</Text> */}
-            <Text style={chatTextStyle}>{text}</Text>
+            {/* <Text style={chatTextStyle}>{text}</Text> */}
+            <Text style={chatTextStyle}>{visibleText}</Text>
         </View>
         {role === "assistant" && (
             <View style={styles.buttonsContainer}>
