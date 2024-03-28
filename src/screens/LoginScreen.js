@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Pressable, Text, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import credentials from '../data/credentials.json';
-import { useAuth } from '../context/AuthContext';
+import { useAppContext } from '../context/AppContext';
 
 const authenticateUser = async (username, password) => {
   const user = credentials.users.find(u => u.username === username && u.password === password);
@@ -15,7 +15,7 @@ const authenticateUser = async (username, password) => {
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuth();
+  const { login } = useAppContext();
 
   const handleLogin = async () => {
     try {

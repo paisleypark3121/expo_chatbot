@@ -1,28 +1,35 @@
 import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import * as Font from 'expo-font';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { AppProvider, useAppContext } from './src/context/AppContext';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import LoginScreen from './src/screens/LoginScreen';
 import ChatbotScreen from './src/screens/ChatbotScreen';
 import ChatSettingsScreen from './src/screens/ChatSettingsScreen';
 import ChatProfileScreen from './src/screens/ChatProfileScreen';
-import NetworkGraphPageScreen from './src/screens/NetworkGraphPageScreen';
 
 
 const Drawer = createDrawerNavigator();
 
+const customFonts = {
+  'OpenDyslexic-Regular': require('./assets/fonts/OpenDyslexic-Regular.otf'),
+};
+
 function CustomDrawerContent(props) {
-  const { logout } = useAuth();
+  const { logout } = useAppContext();
   const { navigation } = props;
 
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
-      {/* <DrawerItem label="Profile" onPress={()=> { navigation.navigate('Profile')}} />
-      <DrawerItem label="Settings" onPress={() => { navigation.navigate('Settings')} } /> */}
       <DrawerItem label="Logout" onPress={() => { logout(); }} />
+      <DrawerItem 
+        label="Reset Chatbot" 
+        onPress={() => navigation.navigate('Chatbot', { reset: true })} 
+      />
     </DrawerContentScrollView>
   );
 }
@@ -33,7 +40,6 @@ const AuthenticatedApp = () => {
       <Drawer.Screen name="Chatbot" component={ChatbotScreen} />
       <Drawer.Screen name="Profile" component={ChatProfileScreen} />
       <Drawer.Screen name="Settings" component={ChatSettingsScreen} />
-      {/* <Drawer.Screen name="Network" component={NetworkGraphPageScreen} /> */}
     </Drawer.Navigator>
   );
 };
@@ -46,17 +52,33 @@ const UnauthenticatedApp = () => {
 };
 
 const MainApp = () => {
-  const { user } = useAuth(); // Usa il contesto per ottenere lo stato dell'utente
+  const { user } = useAppContext();
 
   return user ? <AuthenticatedApp /> : <UnauthenticatedApp />;
 };
 
 export default function App() {
+
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  async function loadFonts() {
+    await Font.loadAsync(customFonts);
+    setFontsLoaded(true);
+  }
+
+  useEffect(() => {
+    loadFonts();
+  }, []);
+
+  if (!fontsLoaded) {
+    return <Text>Loading...</Text>; // Considera l'utilizzo di un componente di loading dedicato
+  }
+
   return (
-    <AuthProvider>
+    <AppProvider>
       <NavigationContainer>
         <MainApp />
       </NavigationContainer>
-    </AuthProvider>
+    </AppProvider>
   );
 }

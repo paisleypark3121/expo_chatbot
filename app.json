@@ -14,6 +14,12 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "fonts": [
+      "./assets/fonts/OpenDyslexic-Bold.otf",
+      "./assets/fonts/OpenDyslexic-BoldItalic.otf",
+      "./assets/fonts/OpenDyslexic-Italic.otf",
+      "./assets/fonts/OpenDyslexic-Regular.otf"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.prof.stefano.durso.ChatBot"
@@ -28,16 +34,16 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "ec54c72b-af12-44ea-bf70-c86f4f3b9e36"
-      }
-    },
     "runtimeVersion": {
       "policy": "appVersion"
     },
+    "extra": {
+      "eas": {
+        "projectId": "e1f3f103-8bfe-4053-9b7e-5642e7cef80e"
+      }
+    },
     "updates": {
-      "url": "https://u.expo.dev/ec54c72b-af12-44ea-bf70-c86f4f3b9e36"
+      "url": "https://u.expo.dev/e1f3f103-8bfe-4053-9b7e-5642e7cef80e"
     }
   }
 }

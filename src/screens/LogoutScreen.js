@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useAuth } from './src/context/AuthContext';
+import { useAppContext } from '../context/AppContext';
 
 export default function LogoutScreen() {
-  const { logout } = useAuth();
+  const { logout } = useAppContext();
 
   return (
     <View style={styles.container}>

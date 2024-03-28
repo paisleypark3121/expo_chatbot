@@ -41,3 +41,29 @@ List all branches: eas branch:list
 Create a new branch: eas branch:create <branch-name>
 Delete a branch: eas branch:delete <branch-name>
 Update a branch: eas update --branch <branch-name> (or simply eas update and later you will be asked to choose the branch)
+
+---
+
+REPLIT FILE:
+
+modules = ["nodejs-20:v8-20230920-bd784b9"]
+hidden = [".config", "package-lock.json"]
+run = "npx expo start --web"
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
+
+[nix]
+channel = "stable-23_05"
+
+[unitTest]
+language = "nodejs"
+
+[deployment]
+run = ["sh", "-c", "npx expo start --web"]
+deploymentTarget = "cloudrun"
+ignorePorts = false
+
+[[ports]]
+localPort = 8081
+externalPort = 80

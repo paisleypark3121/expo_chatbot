@@ -9,72 +9,82 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
+import { useAppContext } from '../context/AppContext';
+import { useTranslation } from 'react-i18next';
+
 
 const ChatSettings = () => {
-  const [lingua, setLingua] = useState('italiano');
-  const [modalita, setModalita] = useState('standard');
+  const [language, setLanguage] = useState('italian');
+  const [mode, setMode] = useState('standard');
+  const { setFont, changeLanguage } = useAppContext();
+
+  const { t } = useTranslation();
 
   useEffect(() => {
-    const caricaImpostazioni = async () => {
+    const loadSettings = async () => {
       try {
-        const linguaSalvata = await AsyncStorage.getItem('@lingua');
-        const modalitaSalvata = await AsyncStorage.getItem('@modalita');
-        if (linguaSalvata !== null) {
-          setLingua(linguaSalvata);
+        const languageSaved = await AsyncStorage.getItem('@language');
+        const modeSaved = await AsyncStorage.getItem('@mode');
+        if (languageSaved !== null) {
+          setLanguage(languageSaved);
         }
-        if (modalitaSalvata !== null) {
-          setModalita(modalitaSalvata);
+        if (modeSaved !== null) {
+          setMode(modeSaved);
         }
       } catch (e) {
-        console.log('Errore nel caricamento delle impostazioni', e);
+        console.log('Error in loading settings', e);
       }
     };
 
-    caricaImpostazioni();
+    loadSettings();
   }, []);
 
-  const salvaImpostazioni = async () => {
+  const saveSettings = async () => {
     try {
-      await AsyncStorage.setItem('@lingua', lingua);
-      await AsyncStorage.setItem('@modalita', modalita);
-      console.log('Impostazioni salvate');
+      await AsyncStorage.setItem('@language', language);
+      await AsyncStorage.setItem('@mode', mode);
+      console.log('Setting Saved');
     } catch (e) {
-      console.log('Errore nel salvataggio delle impostazioni', e);
+      console.log('Error in saving settings', e);
     }
   };
 
-  const showLinguaActionSheet = () => {
+  const showLanguageActionSheet = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['Cancel', 'Italiano', 'Inglese'],
+        options: [t('cancel'), t('italian'), t('english')],
         cancelButtonIndex: 0,
       },
       (buttonIndex) => {
         switch (buttonIndex) {
           case 1:
-            setLingua('italiano');
+            setLanguage('Italiano')
+            changeLanguage('it');            
             break;
           case 2:
-            setLingua('inglese');
+            setLanguage('English')
+            changeLanguage('en');            
             break;
         }
       }
     );
   };
 
-  const showModalitaActionSheet = () => {
+  const showModeActionSheet = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['Cancel', 'Standard', 'Smart'],
+        options: [t('cancel'), 'Standard', 'Smart'],
         cancelButtonIndex: 0,
       },
       (buttonIndex) => {
         switch (buttonIndex) {
           case 1:
-            setModalita('standard');
+            setMode('standard');
+            setFont('default')
             break;
           case 2:
-            setModalita('smart');
+            setMode('smart');
+            setFont('OpenDyslexic-Regular')
             break;
         }
       }
@@ -83,30 +93,30 @@ const ChatSettings = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
+      <Text style={styles.title}>{t('settings')}</Text>
 
       {Platform.OS === 'ios' ? (
         <>
-          <Button title="Seleziona Lingua" onPress={showLinguaActionSheet} />
-          <Text style={styles.selectionText}>Lingua: {lingua}</Text>
-          <Button title="Seleziona Modalità" onPress={showModalitaActionSheet} />
-          <Text style={styles.selectionText}>Modalità: {modalita}</Text>
+          <Button title={t('select language')} onPress={showLanguageActionSheet} />
+          <Text style={styles.selectionText}>{t('Language')}: {language}</Text>
+          <Button title={t('select mode')} onPress={showModeActionSheet} />
+          <Text style={styles.selectionText}>{t('mode')}: {mode}</Text>
         </>
       ) : (
         <>
-          <Text style={styles.label}>Lingua</Text>
+          <Text style={styles.label}>{t('language')}</Text>
           <Picker
-            selectedValue={lingua}
-            onValueChange={(itemValue) => setLingua(itemValue)}
+            selectedValue={language}
+            onValueChange={(itemValue) => setLanguage(itemValue)}
             style={styles.picker}>
-            <Picker.Item label="Italiano" value="italiano" />
-            <Picker.Item label="Inglese" value="inglese" />
+            <Picker.Item label="Italian" value={t('italian')} />
+            <Picker.Item label="English" value={t('english')} />
           </Picker>
 
-          <Text style={styles.label}>Modalità</Text>
+          <Text style={styles.label}>Mode</Text>
           <Picker
-            selectedValue={modalita}
-            onValueChange={(itemValue) => setModalita(itemValue)}
+            selectedValue={mode}
+            onValueChange={(itemValue) => setMode(itemValue)}
             style={styles.picker}>
             <Picker.Item label="Standard" value="standard" />
             <Picker.Item label="Smart" value="smart" />
@@ -115,7 +125,7 @@ const ChatSettings = () => {
       )}
 
       <View style={styles.button}>
-        <Button title="Salva Impostazioni" onPress={salvaImpostazioni} />
+        <Button title={t('save settings')} onPress={saveSettings} />
       </View>
     </View>
   );
