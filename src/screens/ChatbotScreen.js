@@ -257,9 +257,11 @@ const Chatbot = ({ navigation, route })=> {
                     value={userInput}
                     onChangeText={setUserInput}
                 ></TextInput>
-                <Pressable style={styles.micButton} >
-                    <Icon name="mic" size={24} color="#fff" />
-                </Pressable>
+                {Platform.OS === 'web' && (
+                    <Pressable style={styles.micButton} >
+                        <Icon name="mic" size={24} color="#fff" />
+                    </Pressable>
+                )}
                 {/* {isLoadingVoice ? (
                     <Pressable style={styles.micButton} onPress={stopRecording}>
                         <Icon name="stop-circle" size={24} color="#fff" />
