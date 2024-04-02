@@ -32,21 +32,31 @@ export const useAppContext = () => useContext(AppContext);
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [font, setFont] = useState('defaultFont');
-  const [language, setLanguage] = useState(i18n.language);
+  const [mode, setMode] = useState('standard');
+  const [language, setLanguage] = useState(i18n.language); // it / en
 
   useEffect(() => {
-    const loadUserDataAndLanguage = async () => {
+    const loadUserData = async () => {
       const userDataJson = await AsyncStorage.getItem(process.env.EXPO_PUBLIC_LOGIN);
       if (userDataJson) {
         setUser(JSON.parse(userDataJson));
       }
-      const storedLang = await AsyncStorage.getItem('appLanguage');
+      const storedLang = await AsyncStorage.getItem('@language');
       if (storedLang) {
         setLanguage(storedLang);
         i18n.changeLanguage(storedLang);
       }
+
+      const storedMd = await AsyncStorage.getItem('@mode');
+      if (storedMd) {
+        setMode(storedMd);
+        if (storedMd==="smart")
+          setFont('OpenDyslexic-Regular')
+        else
+          setFont('default')
+      }
     };
-    loadUserDataAndLanguage();
+    loadUserData();
   }, []);
 
   const login = async (userData) => {
@@ -60,9 +70,20 @@ export const AppProvider = ({ children }) => {
   };
 
   const changeLanguage = async (lng) => {
+    console.log("@language: "+lng)
     setLanguage(lng);
     i18n.changeLanguage(lng);
-    await AsyncStorage.setItem('appLanguage', lng);
+    await AsyncStorage.setItem('@language', lng);
+  };
+
+  const changeMode = async (md) => {
+    console.log("@mode: "+md)
+    setMode(md);
+    if (md==="smart")
+      setFont('OpenDyslexic-Regular')
+    else
+      setFont('default')
+    await AsyncStorage.setItem('@mode', md);
   };
 
   return (
@@ -72,9 +93,10 @@ export const AppProvider = ({ children }) => {
         login, 
         logout, 
         font, 
-        setFont, 
+        mode,
         language, 
-        changeLanguage 
+        changeLanguage,
+        changeMode 
       }}>
       {children}
     </AppContext.Provider>

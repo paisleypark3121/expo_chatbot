@@ -20,21 +20,70 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '../context/AppContext';
 //import Voice from '@react-native-voice/voice';
 
-const default_system_role_message="You are an helpful assistant"
-const default_voice="com.apple.ttsbundle.siri_Nicky_en-US_compact"
+const system_role_message_en="You are an helpful assistant"
+const system_role_message_it="Sei una assistente virtuale"
+const voice_mobile_en="com.apple.ttsbundle.siri_Nicky_en-US_compact"
+const voice_mobile_it="com.apple.voice.compact.it-IT.Alice"
+const voice_web_en="Microsoft Emma Online (Natural) - English (United States)"
+const voice_web_it="Microsoft Isabella Online (Natural) - Italian (Italy)"
+
+
+
+const system_role_message_en_smart="Your role is to be a helpful assistant with a friendly, "+
+    "understanding, patient, and user-affirming tone. You should: "+
+    "explain topics in short, simple sentences; "+
+    "keep explanations to 2 or 3 sentences at most. "+
+    "If the user provides affirmative or brief responses, "+
+    "take the initiative to continue with relevant information. "+
+    "Check for user understanding after each brief explanation "+
+    "using varied and friendly-toned questions. "+
+    "Use ordered or unordered lists "+
+    "(if longer than 2 items, introduce them one by one and "+
+    "check for understanding before proceeding), or simple text in replies. "+
+    "Provide examples or metaphors if the user doesn't understand. "+
+    "Use the following additional [context] below (if present) to retrieve information; "+
+    "if you cannot retrieve any information from the [context] use your knowledge. "+
+    "[context] {context}"
+
+const system_role_message_en_standard="Your role is to be a helpful assistant with a friendly, "+
+    "understanding, patient, and user-affirming tone. "+
+    "If the user provides affirmative or brief responses, "+
+    "take the initiative to continue with relevant information. "+
+    "Provide examples or metaphors if the user doesn't understand. "+
+    "Use the following additional [context] below (if present) to retrieve information; "+
+    "if you cannot retrieve any information from the [context] use your knowledge. "+
+    "[context] {context}"
+
+const system_role_message_it_smart="Il tuo ruolo è essere un assistente disponibile con un tono amichevole, "+
+    "comprensivo, paziente e affermativo nei confronti dell'utente. Dovresti "+
+    "spiegare argomenti in frasi brevi e semplici, "+
+    "mantenendo le spiegazioni in massimo 2 o 3 frasi. "+
+    "Se l'utente fornisce risposte affermative o brevi, "+
+    "prendi l'iniziativa di continuare con informazioni pertinenti. "+
+    "Verifica la comprensione dell'utente dopo ogni breve spiegazione "+
+    "utilizzando domande variegate e amichevoli. "+
+    "Usa elenchi ordinati o non ordinati "+
+    "(se più lunghi di 2 elementi, introducili uno alla volta e verifica la comprensione prima di procedere) "+
+    "o testo semplice nelle risposte "+
+    "Fornisci esempi o metafore se l'utente non comprende. "+
+    "Utilizza le seguenti informazioni aggiuntive dal [context] (se presente) per recuperare informazioni; "+
+    "se non riesci a recuperare alcuna informazione dal [context], usa le tue conoscenze "+
+    "[context] {context}"
+
+const system_role_message_it_standard="Il tuo ruolo è essere un assistente disponibile con un tono amichevole, "+
+    "comprensivo, paziente e affermativo nei confronti dell'utente. "+
+    "Se l'utente fornisce risposte affermative o brevi, "+
+    "prendi l'iniziativa di continuare con informazioni pertinenti. "+
+    "Fornisci esempi o metafore se l'utente non comprende. "+
+    "Utilizza le seguenti informazioni aggiuntive dal [context] (se presente) per recuperare informazioni; "+
+    "se non riesci a recuperare alcuna informazione dal [context], usa le tue conoscenze "+
+    "[context] {context}"
 
 const Chatbot = ({ navigation, route })=> {
 
-    const {language}=useAppContext();
-    const [systemRole, setSystemRole]=useState( 
-        (language) => {
-            if (language=="it") 
-                return "Sei una assistente virtuale";
-            else 
-                return default_system_role_message;
-        }
-    )
-    //console.log(systemRole)
+    const {language, mode}=useAppContext();
+    const [systemRole, setSystemRole]=useState(system_role_message_en_standard)
+    //console.log("APPCONTEXT: "+language)
 
     const maxMessages = 10;
     const [chat, setChat] = useState([
@@ -50,11 +99,10 @@ const Chatbot = ({ navigation, route })=> {
     const [error, setError] = useState(null);
     const [voice, setVoice] = useState((language) => {
         if (language=="it") 
-            return "com.apple.voice.compact.it-IT.Alice";
+            return voice_mobile_it;
         else 
-            return default_voice;
+            return voice_mobile_en;
     });
-    //const [isLoadingVoice, setLoadingVoice] = useState(false);
     const { t } = useTranslation();
     
     useEffect(() => {
@@ -65,14 +113,33 @@ const Chatbot = ({ navigation, route })=> {
     }, [route.params?.reset]);
 
     useEffect( () => {
-        if (language === "it") {
-            setSystemRole("Sei una assistente virtuale");
-            setVoice("com.apple.voice.compact.it-IT.Alice")
+        
+        // SYSTEM ROLE
+        if (mode === 'smart') {
+            if (language === 'it') 
+                setSystemRole(system_role_message_it_smart);
+            else
+                setSystemRole(system_role_message_en_smart);
         } else {
-            setSystemRole(default_system_role_message);
-            setVoice(default_voice)
+            if (language === 'it') 
+                setSystemRole(system_role_message_it_standard);
+            else
+                setSystemRole(system_role_message_en_standard);
         }
-    }, [language]);
+
+        // VOICE
+        if (Platform.OS === 'ios') {
+            if (language === 'it') 
+                setVoice(voice_mobile_it);
+            else
+                setVoice(voice_mobile_en);
+        } else {
+            if (language === 'it') 
+                setVoice(voice_web_it);
+            else
+                setVoice(voice_web_en);
+        }        
+    },[mode, language]);
 
     useEffect ( () =>{
         setChat([{
@@ -172,9 +239,9 @@ const Chatbot = ({ navigation, route })=> {
             });
 
             const messagesForAPI = chat
-            .filter(c => c.type !== 'mindmap')
-            .map(c => ({ role: c.role, content: c.parts?.[0]?.text || '' })) 
-            .concat(newMessageForAPI);
+                .filter(c => c.type !== 'mindmap')
+                .map(c => ({ role: c.role, content: c.parts?.[0]?.text || '' })) 
+                .concat(newMessageForAPI);
     
             const response = await openai.chat.completions.create({
                 model: process.env.EXPO_PUBLIC_MODEL,
@@ -205,18 +272,6 @@ const Chatbot = ({ navigation, route })=> {
         }
     };
     
-
-    // const renderChatItem=({item}) => (
-    //         <ChatBubble
-    //             role={item.role}
-    //             text={item.parts ? item.parts[0].text : null}
-    //             voice={voice} 
-    //             streaming={item.streaming}
-    //             onGenerateMindMap={() => handleGenerateMindMap(item.parts[0].text)}
-    //             setLoading={setLoading}            
-    //         />
-    // );
-
     return (
         <KeyboardAvoidingView
             style={{flex: 1}} // Make sure it fills the screen

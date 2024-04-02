@@ -12,42 +12,16 @@ import { Picker } from '@react-native-picker/picker';
 import { useAppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 
-
 const ChatSettings = () => {
-  const [language, setLanguage] = useState('italian');
-  const [mode, setMode] = useState('standard');
-  const { setFont, changeLanguage } = useAppContext();
+  // const [languageLabel, setLanguageLabel] = useState('');
+  // const [pickerValue, setPickerValue] = useState('');
+  const {language, mode, changeLanguage, changeMode} = useAppContext();
+
+  const translateLanguage = (language) => {
+    return language === 'it' ? 'Italiano' : 'English';
+  };
 
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const languageSaved = await AsyncStorage.getItem('@language');
-        const modeSaved = await AsyncStorage.getItem('@mode');
-        if (languageSaved !== null) {
-          setLanguage(languageSaved);
-        }
-        if (modeSaved !== null) {
-          setMode(modeSaved);
-        }
-      } catch (e) {
-        console.log('Error in loading settings', e);
-      }
-    };
-
-    loadSettings();
-  }, []);
-
-  const saveSettings = async () => {
-    try {
-      await AsyncStorage.setItem('@language', language);
-      await AsyncStorage.setItem('@mode', mode);
-      console.log('Setting Saved');
-    } catch (e) {
-      console.log('Error in saving settings', e);
-    }
-  };
 
   const showLanguageActionSheet = () => {
     ActionSheetIOS.showActionSheetWithOptions(
@@ -58,11 +32,9 @@ const ChatSettings = () => {
       (buttonIndex) => {
         switch (buttonIndex) {
           case 1:
-            setLanguage('Italiano')
             changeLanguage('it');            
             break;
           case 2:
-            setLanguage('English')
             changeLanguage('en');            
             break;
         }
@@ -79,17 +51,16 @@ const ChatSettings = () => {
       (buttonIndex) => {
         switch (buttonIndex) {
           case 1:
-            setMode('standard');
-            setFont('default')
+            changeMode('standard');
             break;
           case 2:
-            setMode('smart');
-            setFont('OpenDyslexic-Regular')
+            changeMode('smart');
             break;
         }
       }
     );
   };
+  
 
   return (
     <View style={styles.container}>
@@ -98,7 +69,7 @@ const ChatSettings = () => {
       {Platform.OS === 'ios' ? (
         <>
           <Button title={t('select language')} onPress={showLanguageActionSheet} />
-          <Text style={styles.selectionText}>{t('Language')}: {language}</Text>
+          <Text style={styles.selectionText}>{t('Language')}: {translateLanguage(language)}</Text>
           <Button title={t('select mode')} onPress={showModeActionSheet} />
           <Text style={styles.selectionText}>{t('mode')}: {mode}</Text>
         </>
@@ -107,26 +78,24 @@ const ChatSettings = () => {
           <Text style={styles.label}>{t('language')}</Text>
           <Picker
             selectedValue={language}
-            onValueChange={(itemValue) => setLanguage(itemValue)}
+            onValueChange={(itemValue) => changeLanguage(itemValue)}
             style={styles.picker}>
-            <Picker.Item label="Italian" value={t('italian')} />
-            <Picker.Item label="English" value={t('english')} />
+            <Picker.Item label={t('italian')} value="it" />
+            <Picker.Item label={t('english')} value="en" />
           </Picker>
 
           <Text style={styles.label}>Mode</Text>
           <Picker
             selectedValue={mode}
-            onValueChange={(itemValue) => setMode(itemValue)}
+            onValueChange={(itemValue) => {
+              changeMode(itemValue);
+            }}
             style={styles.picker}>
             <Picker.Item label="Standard" value="standard" />
             <Picker.Item label="Smart" value="smart" />
           </Picker>
         </>
       )}
-
-      <View style={styles.button}>
-        <Button title={t('save settings')} onPress={saveSettings} />
-      </View>
     </View>
   );
 };

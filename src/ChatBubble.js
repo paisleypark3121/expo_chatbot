@@ -9,64 +9,89 @@ const ChatBubble = ({ role, text, voice, onGenerateMindMap, type, htmlContent, s
     const [showWebView, setShowWebView] = useState(false);
     const { font, setFont } = useAppContext();
     const [visibleText, setVisibleText] = useState('');
+    const [isSpeaking, setIsSpeaking] = useState(false);
 
     const chatTextStyle = {
         ...styles.chatText,
         fontFamily: font === 'OpenDyslexic-Regular' ? 'OpenDyslexic-Regular' : 'System',
     };
 
+    // useEffect(() => {
+    //     if (streaming) {
+    //         let index = 0;
+    //         setVisibleText('');
+    
+    //         const intervalId = setInterval(() => {
+    //             //console.log(`Index: ${index}, Char: '${text.charAt(index)}'`);
+                
+    //             if (index < text.length) {
+    //                 setVisibleText(
+    //                     (prevText) => {
+    //                         //console.log(prevText)
+    //                         prevText + text.charAt(index)
+    //                     }
+    //                 );
+    //                 index++;
+    //             } else {
+    //                 clearInterval(intervalId);
+    //             }
+    //         }, 80);
+    
+    //         return () => clearInterval(intervalId); 
+    //     } else {
+    //         setVisibleText(text);
+    //     }
+    // }, [text, streaming]); 
+
     useEffect(() => {
-        console.log("EFFECT")
-        console.log(streaming)
         if (streaming) {
             let index = 0;
-            setVisibleText('');
-    
-            const intervalId = setInterval(() => {
+            const step=1;
+            const sleepTime=100;
+            let localVisibleText = ''; // Use a local variable to build up text in chunks
+
+            // Function to update text in chunks
+            const updateText = () => {
+                // Determine the next chunk of text to add
+                const nextChunk = text.substring(index, index + step); // Chunk size of 5, adjust as needed
+                localVisibleText += nextChunk;
+                index += step; // Move index by chunk size
+
+                // Update state with the new chunk of text
+                setVisibleText(localVisibleText);
+
+                // If there's more text to display, schedule the next update
                 if (index < text.length) {
-                    setVisibleText((prevText) => prevText + text.charAt(index));
-                    index++;
-                } else {
-                    clearInterval(intervalId);
+                    setTimeout(updateText, sleepTime ); // Update interval, adjust as needed
                 }
-            }, 30); // Regola la velocità di visualizzazione qui
-    
-            return () => clearInterval(intervalId); // Cleanup per evitare effetti indesiderati
+            };
+
+            updateText(); // Start the text update process
+
+            // Cleanup function to clear the timeout if the component unmounts
+            return () => {
+                setVisibleText(''); // Optionally reset visibleText on cleanup
+            };
         } else {
-            setVisibleText(text);
+            setVisibleText(text); // If not streaming, immediately display the full text
         }
-    }, [text, streaming]); 
+    }, [text, streaming]);
 
     const speak = async () => {
-        // try {
-        //     //console.log(voice.identifier)
-        //     voide_id=voice.identifier
-        //     voice_id='com.apple.ttsbundle.siri_Nicky_en-US_compact'
-        //     //console.log({text})
-        //     Speech.speak(text, {
-        //         voice: voice ? voice_id : undefined,
-        //         rate: 0.7, // Slower rate
-        //         pitch: 1.5, // Slightly higher pitch
-        //         volume: 0.8 // Slightly lower volume than the max
-        //     });
-        //     // Speech.speak("Hello world", {
-        //     //     voice: voice ? voice.identifier : undefined,
-        //     // });
-        // }
-        // catch(error) {
-        //     console.error(error)
-        // }
-        try {
+        //console.log(voice)
+        if (isSpeaking) {
+            Speech.stop();
+        } else {
             Speech.speak(text, {
                 voice: voice,
-                rate: 0.7,
-                pitch: 1.5,
-                volume: 0.8
+                // rate: 0.7,
+                // pitch: 1.5,
+                // volume: 0.8,
+                onDone: () => setIsSpeaking(false),
+                onError: () => setIsSpeaking(false),
             });
         }
-        catch(error) {
-            console.error(error)
-        }
+        setIsSpeaking(!isSpeaking);
     };
 
     const handleMindMap = () => {
@@ -102,7 +127,7 @@ const ChatBubble = ({ role, text, voice, onGenerateMindMap, type, htmlContent, s
             <View style={styles.buttonsContainer}>
                 <Pressable style={styles.button} onPress={speak}>
                     {/* <Text style={styles.buttonText}>Speak</Text> */}
-                    <Icon name="volume-up" size={20} color="#fff" />
+                    <Icon name={isSpeaking ? "stop" : "play-arrow"} size={20} color="#fff" />
                 </Pressable>
                 <Pressable style={styles.button} onPress={handleMindMap}>
                     {/* <Text style={styles.buttonText}>Mind Map</Text> */}
