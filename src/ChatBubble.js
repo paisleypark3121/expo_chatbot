@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform, Modal } from 'react-native';
 import * as Speech from 'expo-speech';
 import { WebView } from 'react-native-webview';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -102,15 +102,23 @@ const ChatBubble = ({ role, text, voice, onGenerateMindMap, type, htmlContent, s
     };
 
     if (type === 'mindmap' && htmlContent) {
-        return (
-            // <View style={[styles.chatItem, styles.assistantChatItem]}>
+        if (Platform.OS === 'web') {
+            //return <iframe srcDoc={htmlContent} style={styles.webView} />;
+
+            htmlContent = htmlContent.replace(/"enabled": "False"/g, '"enabled": false');
+            htmlContent = htmlContent.replace(/"enabled": "True"/g, '"enabled": true');
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            return <iframe src={url} style={styles.webView_web} />;
+        } else {
+            return (
                 <WebView
                     originWhitelist={['*']}
                     source={{ html: htmlContent }}
-                    style={styles.webView}
+                    style={styles.webView_mobile}
                 />
-            //</View>
-        );
+            );
+        }
     }
 
     return (
@@ -140,9 +148,13 @@ const ChatBubble = ({ role, text, voice, onGenerateMindMap, type, htmlContent, s
 };
 
 const styles = StyleSheet.create({
-    webView: {
+    webView_mobile: {
         //width: '100%',
         height: 200,
+    },
+    webView_web: {
+        //width: '100%',
+        height: 400,
     },
     chatItem: {
         marginBottom: 10,

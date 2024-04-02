@@ -113,7 +113,7 @@ const Chatbot = ({ navigation, route })=> {
     }, [route.params?.reset]);
 
     useEffect( () => {
-        
+
         // SYSTEM ROLE
         if (mode === 'smart') {
             if (language === 'it') 
@@ -200,7 +200,7 @@ const Chatbot = ({ navigation, route })=> {
             const jsonResponse = await response.json();
     
             if (jsonResponse.success && jsonResponse.html) {
-                
+                //console.log(jsonResponse.html)
                 setChat(currentChat => [
                     ...currentChat,
                     {
